@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Trends Data</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Google Trends Data</h1>
+    <canvas id="myChart" width="400" height="200"></canvas>
+    <script>
+        async function fetchData() {
+            const response = await fetch('/data');
+            const data = await response.json();
+            console.log(data);  // Để kiểm tra xem dữ liệu đã được tải lên thành công hay chưa
+            return data;
+        }
+
+        async function createChart() {
+            const data = await fetchData();
+            if (data.length === 0) {
+                console.error('No data available');
+                return;
+            }
+
+            const labels = data.map(item => item.date.split('T')[0]);
+            const pythonData = data.map(item => item.Python);
+            const javaData = data.map(item => item.Java);
+
+            const ctx = document.getElementById('myChart').getContext('2d');
+            const myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Python',
+                        data: pythonData,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1,
+                        fill: false
+                    }, {
+                        label: 'Java',
+                        data: javaData,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1,
+                        fill: false
+                    }]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'month'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        createChart();
+    </script>
+</body>
+</html>
